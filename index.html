@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ayudante</title>
+<title>Ayudante Scrabble</title>
 
 <style>
 body{
@@ -110,11 +110,15 @@ td a:hover {
 </head>
 <body>
 
-<h1>Ayudante Scrabble</h1>
+<h1>Ayudín</h1>
 
 <div class="formulario">
-    <input id="letras" maxlength="7" placeholder="LETRAS" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-    <input id="extra" maxlength="1" placeholder="+1" autocomplete="off">
+    <!-- Bloquea en tiempo real todo lo que no sea letras, Ñ o comodines (*, ?, #) -->
+    <input id="letras" maxlength="7" placeholder="LETRAS" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="this.value = this.value.toUpperCase().replace(/[^A-ZÑ*?#]/g, '')">
+    
+    <!-- Bloquea en tiempo real todo lo que no sea una letra o Ñ -->
+    <input id="extra" maxlength="1" placeholder="+1" inputmode="search" autocomplete="off" oninput="this.value = this.value.toUpperCase().replace(/[^A-ZÑ]/g, '')">
+    
     <button onclick="buscar()">Buscar</button>
 </div>
 
