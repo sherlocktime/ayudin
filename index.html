@@ -1,252 +1,256 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ayudante Scrabble</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayudante Scrabble</title>
 
-<style>
-body{
-    font-family:sans-serif;
-    max-width:600px; /* Más compacto y minimalista */
-    margin:auto;
-    padding:40px 20px;
-    background-color: #121212;
-    color: #e0e0e0;
-}
+    <meta name="theme-color" content="#121212" /> <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
 
-h1 {
-    font-size: 24px;
-    font-weight: 300;
-    text-align: center;
-    margin-bottom: 30px;
-    color: #ffffff;
-}
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 40px 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
 
-.formulario {
-    display: flex;
-    justify-content: center; /* Centra los elementos contiguos */
-    gap: 5px;
-    margin-bottom: 20px;
-}
+        h1 {
+            font-size: 24px;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
 
-input{
-    font-size:18px;
-    padding:10px;
-    text-transform:uppercase;
-    background-color: #1e1e1e;
-    color: #ffffff;
-    border: 1px solid #333;
-    border-radius: 4px;
-    outline: none;
-}
+        .formulario {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
 
-input:focus {
-    border-color: #555;
-}
+        input {
+            font-size: 18px;
+            padding: 10px;
+            text-transform: uppercase;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333;
+            border-radius: 4px;
+            outline: none;
+        }
 
-#letras {
-    max-width: 130px; /* Tamaño justo para 7 letras + comodines */
-    text-align: center;
-}
+        input:focus {
+            border-color: #555;
+        }
 
-#extra {
-    width: 45px;
-    text-align: center;
-}
+        #letras {
+            max-width: 130px;
+            text-align: center;
+        }
 
-button{
-    font-size:18px;
-    padding:10px 15px;
-    cursor: pointer;
-    background-color: #2e2e2e;
-    color: #ffffff;
-    border: 1px solid #444;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
+        #extra {
+            width: 45px;
+            text-align: center;
+        }
 
-button:hover {
-    background-color: #3e3e3e;
-}
+        button {
+            font-size: 18px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #2e2e2e;
+            color: #ffffff;
+            border: 1px solid #444;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
 
-#estado{
-    margin:15px 0;
-    color:#888;
-    font-size: 14px;
-    text-align: center;
-}
+        button:hover {
+            background-color: #3e3e3e;
+        }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top: 10px;
-}
+        #estado {
+            margin: 15px 0;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
 
-th,td{
-    padding:10px;
-    text-align: left;
-    border-bottom: 1px solid #222;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
 
-th{
-    background:#1a1a1a;
-    color: #888;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
 
-td a {
-    color: #64b5f6;
-    text-decoration: none;
-    font-weight: bold;
-}
+        th {
+            background: #1a1a1a;
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-td a:hover {
-    text-decoration: underline;
-}
-</style>
+        td a {
+            color: #64b5f6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Ayudín</h1>
+    <h1>Ayudín</h1>
 
-<div class="formulario">
-    <!-- Bloquea en tiempo real todo lo que no sea letras, Ñ o comodines (*, ?, #) -->
-    <input id="letras" maxlength="7" placeholder="LETRAS" inputmode="search" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="this.value = this.value.toUpperCase().replace(/[^A-ZÑ*?#]/g, '')">
-    
-    <!-- Bloquea en tiempo real todo lo que no sea una letra o Ñ -->
-    <input id="extra" maxlength="1" placeholder="+1" inputmode="search" autocomplete="off" oninput="this.value = this.value.toUpperCase().replace(/[^A-ZÑ]/g, '')">
-    
-    <button onclick="buscar()">Buscar</button>
-</div>
+    <div class="formulario">
+        <input id="letras" maxlength="7" placeholder="LETRAS" autocomplete="off" autocorrect="off"
+            autocapitalize="characters" spellcheck="false">
+        <input id="extra" maxlength="1" placeholder="+1" autocomplete="off">
+        <button onclick="buscar()">Buscar</button>
+    </div>
 
-<div id="estado">Cargando diccionario...</div>
+    <div id="estado">Cargando diccionario...</div>
 
-<table>
-<thead>
-<tr>
-    <th>Palabra</th>
-    <th>Largo</th>
-    <th>Puntaje</th>
-</tr>
-</thead>
-<tbody id="resultados"></tbody>
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>Palabra</th>
+                <th>Largo</th>
+                <th>Puntaje</th>
+            </tr>
+        </thead>
+        <tbody id="resultados"></tbody>
+    </table>
 
-<script>
+    <script>
 
-let diccionario = [];
+        let diccionario = [];
 
-const valores = {
-    A:1,E:1,O:1,S:1,I:1,U:1,N:1,R:1,T:1,
-    D:2,G:2,L:2,
-    C:3,M:3,B:3,P:3,
-    F:4,H:4,V:4,Y:4,
-    Q:5,
-    J:8,Ñ:8,X:8,
-    Z:10
-};
+        const valores = {
+            A: 1, E: 1, O: 1, S: 1, I: 1, U: 1, N: 1, R: 1, T: 1,
+            D: 2, G: 2, L: 2,
+            C: 3, M: 3, B: 3, P: 3,
+            F: 4, H: 4, V: 4, Y: 4,
+            Q: 5,
+            J: 8, Ñ: 8, X: 8,
+            Z: 10
+        };
 
-function contarLetras(texto){
-    const mapa = {};
-    for(const letra of texto){
-        mapa[letra] = (mapa[letra] || 0) + 1;
-    }
-    return mapa;
-}
+        function contarLetras(texto) {
+            const mapa = {};
+            for (const letra of texto) {
+                mapa[letra] = (mapa[letra] || 0) + 1;
+            }
+            return mapa;
+        }
 
-function puedeFormarse(palabra, letrasJugador, letraExtra){
-    const disponibles = contarLetras(letrasJugador);
-    const comodines = (disponibles['*'] || 0) + (disponibles['?'] || 0) + (disponibles['#'] || 0);
+        function puedeFormarse(palabra, letrasJugador, letraExtra) {
+            const disponibles = contarLetras(letrasJugador);
+            const comodines = (disponibles['*'] || 0) + (disponibles['?'] || 0) + (disponibles['#'] || 0);
 
-    if(letraExtra){
-        disponibles[letraExtra] = (disponibles[letraExtra] || 0) + 1;
-    }
+            if (letraExtra) {
+                disponibles[letraExtra] = (disponibles[letraExtra] || 0) + 1;
+            }
 
-    if(letraExtra && !palabra.includes(letraExtra)){
-        return false;
-    }
+            if (letraExtra && !palabra.includes(letraExtra)) {
+                return false;
+            }
 
-    const necesita = contarLetras(palabra);
-    let comodinesNecesarios = 0;
-    let letrasUsadasComodon = [];
+            const necesita = contarLetras(palabra);
+            let comodinesNecesarios = 0;
+            let letrasUsadasComodon = [];
 
-    for(const letra in necesita){
-        const faltan = necesita[letra] - (disponibles[letra] || 0);
-        if(faltan > 0){
-            comodinesNecesarios += faltan;
-            for(let i = 0; i < faltan; i++) {
-                letrasUsadasComodon.push(letra);
+            for (const letra in necesita) {
+                const faltan = necesita[letra] - (disponibles[letra] || 0);
+                if (faltan > 0) {
+                    comodinesNecesarios += faltan;
+                    for (let i = 0; i < faltan; i++) {
+                        letrasUsadasComodon.push(letra);
+                    }
+                }
+            }
+
+            if (comodinesNecesarios > comodines) {
+                return false;
+            }
+
+            let puntaje = 0;
+            for (const letra of palabra) {
+                puntaje += valores[letra] || 0;
+            }
+
+            for (const letra of letrasUsadasComodon) {
+                puntaje -= valores[letra] || 0;
+            }
+
+            return { posible: true, puntaje: puntaje };
+        }
+
+        async function cargarDiccionario() {
+            try {
+                const respuesta = await fetch("diccionario.txt");
+                const texto = await respuesta.text();
+
+                diccionario = texto
+                    .split(/\r?\n/)
+                    .map(p => p.trim().toUpperCase())
+                    .filter(Boolean);
+
+                document.getElementById("estado").textContent =
+                    `${diccionario.length} palabras cargadas`;
+            } catch (e) {
+                document.getElementById("estado").textContent = "Error al cargar el diccionario.txt";
             }
         }
-    }
 
-    if(comodinesNecesarios > comodines){
-        return false;
-    }
+        function buscar() {
+            const letras = document.getElementById("letras").value.toUpperCase().replace(/[^A-ZÑ*?#]/g, '');
+            const extra = document.getElementById("extra").value.toUpperCase().replace(/[^A-ZÑ]/g, '');
 
-    let puntaje = 0;
-    for(const letra of palabra){
-        puntaje += valores[letra] || 0;
-    }
-    
-    for(const letra of letrasUsadasComodon) {
-        puntaje -= valores[letra] || 0;
-    }
+            const resultados = [];
 
-    return { posible: true, puntaje: puntaje };
-}
+            for (const palabra of diccionario) {
+                const resultadoValidacion = puedeFormarse(palabra, letras, extra);
 
-async function cargarDiccionario(){
-    try {
-        const respuesta = await fetch("diccionario.txt");
-        const texto = await respuesta.text();
+                if (resultadoValidacion.posible) {
+                    resultados.push({
+                        palabra,
+                        largo: palabra.length,
+                        puntaje: resultadoValidacion.puntaje
+                    });
+                }
+            }
 
-        diccionario = texto
-            .split(/\r?\n/)
-            .map(p => p.trim().toUpperCase())
-            .filter(Boolean);
+            resultados.sort((a, b) =>
+                b.largo - a.largo ||
+                b.puntaje - a.puntaje ||
+                a.palabra.localeCompare(b.palabra)
+            );
 
-        document.getElementById("estado").textContent =
-            `${diccionario.length} palabras cargadas`;
-    } catch(e) {
-        document.getElementById("estado").textContent = "Error al cargar el diccionario.txt";
-    }
-}
+            const tbody = document.getElementById("resultados");
+            tbody.innerHTML = "";
 
-function buscar(){
-    const letras = document.getElementById("letras").value.toUpperCase().replace(/[^A-ZÑ*?#]/g,'');
-    const extra = document.getElementById("extra").value.toUpperCase().replace(/[^A-ZÑ]/g,'');
+            for (const r of resultados) {
+                const tr = document.createElement("tr");
 
-    const resultados = [];
-
-    for(const palabra of diccionario){
-        const resultadoValidacion = puedeFormarse(palabra, letras, extra);
-        
-        if(resultadoValidacion.posible){
-            resultados.push({
-                palabra,
-                largo: palabra.length,
-                puntaje: resultadoValidacion.puntaje
-            });
-        }
-    }
-
-    resultados.sort((a,b)=>
-        b.largo - a.largo ||
-        b.puntaje - a.puntaje ||
-        a.palabra.localeCompare(b.palabra)
-    );
-
-    const tbody = document.getElementById("resultados");
-    tbody.innerHTML = "";
-
-    for(const r of resultados){
-        const tr = document.createElement("tr");
-        
-        tr.innerHTML = `
+                tr.innerHTML = `
             <td>
                 <a href="https://dle.rae.es/${r.palabra.toLowerCase()}" target="_blank" rel="noopener noreferrer">
                     ${r.palabra}
@@ -255,15 +259,16 @@ function buscar(){
             <td>${r.largo}</td>
             <td>${r.puntaje}</td>
         `;
-        tbody.appendChild(tr);
-    }
+                tbody.appendChild(tr);
+            }
 
-    document.getElementById("estado").textContent =
-        `${resultados.length} palabras encontradas`;
-}
+            document.getElementById("estado").textContent =
+                `${resultados.length} palabras encontradas`;
+        }
 
-cargarDiccionario();
-</script>
+        cargarDiccionario();
+    </script>
 
 </body>
+
 </html>
