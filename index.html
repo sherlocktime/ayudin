@@ -1,1 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayudante Scrabble</title>
 
+<style>
+body{
+    font-family:sans-serif;
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+input{
+    font-size:20px;
+    padding:8px;
+    margin:5px;
+    text-transform:uppercase;
+}
+
+button{
+    font-size:20px;
+    padding:8px 16px;
+}
+
+#estado{
+    margin:10px 0;
+    color:#666;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:6px;
+}
+
+th{
+    background:#eee;
+}
+</style>
+</head>
+<body>
+
+<h1>Ayudante Scrabble</h1>
+
+<div>
+    <label>Tus letras:</label><br>
+    <input id="letras" placeholder="AEIRST">
+</div>
+
+<div>
+    <label>Letra del tablero (opcional):</label><br>
+    <input id="extra" maxlength="1" placeholder="L">
+</div>
+
+<button onclick="buscar()">Buscar</button>
+
+<div id="estado">Cargando diccionario...</div>
+
+<table>
+<thead>
+<tr>
+    <th>Palabra</th>
+    <th>Largo</th>
+    <th>Puntaje</th>
+</tr>
+</thead>
+<tbody id="resultados"></tbody>
+</table>
+
+<script>
+
+let diccionario = [];
+
+const valores = {
+    A:1,E:1,O:1,S:1,I:1,U:1,N:1,R:1,T:1,
+    D:2,G:2,L:2,
+    C:3,M:3,B:3,P:3,
+    F:4,H:4,V:4,Y:4,
+    Q:5,
+    J:8,Ñ:8,X:8,
+    Z:10
+};
+
+function contarLetras(texto){
+    const mapa = {};
+
+    for(const letra of texto){
+        mapa[letra] = (mapa[letra] || 0) + 1;
+    }
+
+    return mapa;
+}
+
+function puntajePalabra(palabra){
+    let total = 0;
+
+    for(const letra of palabra){
+        total += valores[letra] || 0;
+    }
+
+    return total;
+}
+
+function puedeFormarse(palabra, letrasJugador, letraExtra){
+
+    const disponibles = contarLetras(letrasJugador);
+
+    if(letraExtra){
+        disponibles[letraExtra] =
+            (disponibles[letraExtra] || 0) + 1;
+    }
+
+    const necesita = contarLetras(palabra);
+
+    for(const letra in necesita){
+
+        if((disponibles[letra] || 0) < necesita[letra]){
+            return false;
+        }
+    }
+
+    if(letraExtra){
+        if(!palabra.includes(letraExtra)){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+async function cargarDiccionario(){
+
+    const respuesta = await fetch("diccionario.txt");
+
+    const texto = await respuesta.text();
+
+    diccionario = texto
+        .split(/\r?\n/)
+        .map(p => p.trim().toUpperCase())
+        .filter(Boolean);
+
+    document.getElementById("estado").textContent =
+        `${diccionario.length} palabras cargadas`;
+}
+
+function buscar(){
+
+    const letras =
+        document.getElementById("letras")
+        .value
+        .toUpperCase()
+        .replace(/[^A-ZÑ]/g,'');
+
+    const extra =
+        document.getElementById("extra")
+        .value
+        .toUpperCase()
+        .replace(/[^A-ZÑ]/g,'');
+
+    const resultados = [];
+
+    for(const palabra of diccionario){
+
+        if(
+            puedeFormarse(
+                palabra,
+                letras,
+                extra
+            )
+        ){
+            resultados.push({
+                palabra,
+                largo: palabra.length,
+                puntaje: puntajePalabra(palabra)
+            });
+        }
+    }
+
+    resultados.sort((a,b)=>
+        b.largo - a.largo ||
+        b.puntaje - a.puntaje ||
+        a.palabra.localeCompare(b.palabra)
+    );
+
+    const tbody =
+        document.getElementById("resultados");
+
+    tbody.innerHTML = "";
+
+    for(const r of resultados){
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${r.palabra}</td>
+            <td>${r.largo}</td>
+            <td>${r.puntaje}</td>
+        `;
+
+        tbody.appendChild(tr);
+    }
+
+    document.getElementById("estado").textContent =
+        `${resultados.length} palabras encontradas`;
+}
+
+cargarDiccionario();
+
+</script>
+
+</body>
+</html>
