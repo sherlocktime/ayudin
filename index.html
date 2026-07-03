@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ayudante Scrabble</title>
+<title>Ayudante</title>
 
 <style>
 body{
     font-family:sans-serif;
-    max-width:600px;
+    max-width:600px; /* Más compacto y minimalista */
     margin:auto;
     padding:40px 20px;
     background-color: #121212;
@@ -25,6 +25,7 @@ h1 {
 
 .formulario {
     display: flex;
+    justify-content: center; /* Centra los elementos contiguos */
     gap: 5px;
     margin-bottom: 20px;
 }
@@ -45,17 +46,18 @@ input:focus {
 }
 
 #letras {
-    flex-grow: 1;
+    max-width: 130px; /* Tamaño justo para 7 letras + comodines */
+    text-align: center;
 }
 
 #extra {
-    width: 50px;
+    width: 45px;
     text-align: center;
 }
 
 button{
     font-size:18px;
-    padding:10px 20px;
+    padding:10px 15px;
     cursor: pointer;
     background-color: #2e2e2e;
     color: #ffffff;
@@ -108,10 +110,10 @@ td a:hover {
 </head>
 <body>
 
-<h1>Ayudín</h1>
+<h1>Ayudante Scrabble</h1>
 
 <div class="formulario">
-    <input id="letras" maxlength="7" placeholder="LETRAS (*, ?, #)" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+    <input id="letras" maxlength="7" placeholder="LETRAS" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
     <input id="extra" maxlength="1" placeholder="+1" autocomplete="off">
     <button onclick="buscar()">Buscar</button>
 </div>
