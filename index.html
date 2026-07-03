@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ayudín para el Scrabble</title>
+<title>Ayudante</title>
 
 <style>
 body{
@@ -13,16 +13,31 @@ body{
     padding:20px;
 }
 
+.formulario {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
 input{
     font-size:20px;
     padding:8px;
-    margin:5px;
     text-transform:uppercase;
+}
+
+#letras {
+    width: 220px;
+}
+
+#extra {
+    width: 50px;
+    text-align: center;
 }
 
 button{
     font-size:20px;
     padding:8px 16px;
+    cursor: pointer;
 }
 
 #estado{
@@ -43,23 +58,28 @@ th,td{
 th{
     background:#eee;
 }
+
+/* Estilo para los enlaces de las palabras */
+td a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
 </style>
 </head>
 <body>
 
 <h1>Ayudante Scrabble</h1>
 
-<div>
-    <label>Tus letras:</label><br>
-    <input id="letras" placeholder="AEIRST">
+<div class="formulario">
+    <input id="letras" maxlength="7" placeholder="LETRAS (*, ?, #)" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+    <input id="extra" maxlength="1" placeholder="+1" autocomplete="off">
+    <button onclick="buscar()">Buscar</button>
 </div>
-
-<div>
-    <label>Letra del tablero (opcional):</label><br>
-    <input id="extra" maxlength="1" placeholder="L">
-</div>
-
-<button onclick="buscar()">Buscar</button>
 
 <div id="estado">Cargando diccionario...</div>
 
@@ -90,95 +110,85 @@ const valores = {
 
 function contarLetras(texto){
     const mapa = {};
-
     for(const letra of texto){
         mapa[letra] = (mapa[letra] || 0) + 1;
     }
-
     return mapa;
 }
 
-function puntajePalabra(palabra){
-    let total = 0;
-
-    for(const letra of palabra){
-        total += valores[letra] || 0;
-    }
-
-    return total;
-}
-
 function puedeFormarse(palabra, letrasJugador, letraExtra){
-
     const disponibles = contarLetras(letrasJugador);
+    const comodines = (disponibles['*'] || 0) + (disponibles['?'] || 0) + (disponibles['#'] || 0);
 
     if(letraExtra){
-        disponibles[letraExtra] =
-            (disponibles[letraExtra] || 0) + 1;
+        disponibles[letraExtra] = (disponibles[letraExtra] || 0) + 1;
+    }
+
+    if(letraExtra && !palabra.includes(letraExtra)){
+        return false;
     }
 
     const necesita = contarLetras(palabra);
+    let comodinesNecesarios = 0;
+    let letrasUsadasComodon = [];
 
     for(const letra in necesita){
-
-        if((disponibles[letra] || 0) < necesita[letra]){
-            return false;
+        const faltan = necesita[letra] - (disponibles[letra] || 0);
+        if(faltan > 0){
+            comodinesNecesarios += faltan;
+            for(let i = 0; i < faltan; i++) {
+                letrasUsadasComodon.push(letra);
+            }
         }
     }
 
-    if(letraExtra){
-        if(!palabra.includes(letraExtra)){
-            return false;
-        }
+    if(comodinesNecesarios > comodines){
+        return false;
     }
 
-    return true;
+    let puntaje = 0;
+    for(const letra of palabra){
+        puntaje += valores[letra] || 0;
+    }
+    
+    for(const letra of letrasUsadasComodon) {
+        puntaje -= valores[letra] || 0;
+    }
+
+    return { posible: true, puntaje: puntaje };
 }
 
 async function cargarDiccionario(){
+    try {
+        const respuesta = await fetch("diccionario.txt");
+        const texto = await respuesta.text();
 
-    const respuesta = await fetch("diccionario.txt");
+        diccionario = texto
+            .split(/\r?\n/)
+            .map(p => p.trim().toUpperCase())
+            .filter(Boolean);
 
-    const texto = await respuesta.text();
-
-    diccionario = texto
-        .split(/\r?\n/)
-        .map(p => p.trim().toUpperCase())
-        .filter(Boolean);
-
-    document.getElementById("estado").textContent =
-        `${diccionario.length} palabras cargadas`;
+        document.getElementById("estado").textContent =
+            `${diccionario.length} palabras cargadas`;
+    } catch(e) {
+        document.getElementById("estado").textContent = "Error al cargar el diccionario.txt";
+    }
 }
 
 function buscar(){
-
-    const letras =
-        document.getElementById("letras")
-        .value
-        .toUpperCase()
-        .replace(/[^A-ZÑ]/g,'');
-
-    const extra =
-        document.getElementById("extra")
-        .value
-        .toUpperCase()
-        .replace(/[^A-ZÑ]/g,'');
+    const letras = document.getElementById("letras").value.toUpperCase().replace(/[^A-ZÑ*?#]/g,'');
+    const extra = document.getElementById("extra").value.toUpperCase().replace(/[^A-ZÑ]/g,'');
 
     const resultados = [];
 
     for(const palabra of diccionario){
-
-        if(
-            puedeFormarse(
-                palabra,
-                letras,
-                extra
-            )
-        ){
+        const resultadoValidacion = puedeFormarse(palabra, letras, extra);
+        
+        if(resultadoValidacion.posible){
             resultados.push({
                 palabra,
                 largo: palabra.length,
-                puntaje: puntajePalabra(palabra)
+                puntaje: resultadoValidacion.puntaje
             });
         }
     }
@@ -189,21 +199,22 @@ function buscar(){
         a.palabra.localeCompare(b.palabra)
     );
 
-    const tbody =
-        document.getElementById("resultados");
-
+    const tbody = document.getElementById("resultados");
     tbody.innerHTML = "";
 
     for(const r of resultados){
-
         const tr = document.createElement("tr");
-
+        
+        // Se añade el enlace dinámico a la RAE usando minúsculas para la URL estándar
         tr.innerHTML = `
-            <td>${r.palabra}</td>
+            <td>
+                <a href="https://dle.rae.es/${r.palabra.toLowerCase()}" target="_blank" rel="noopener noreferrer">
+                    ${r.palabra}
+                </a>
+            </td>
             <td>${r.largo}</td>
             <td>${r.puntaje}</td>
         `;
-
         tbody.appendChild(tr);
     }
 
@@ -212,7 +223,6 @@ function buscar(){
 }
 
 cargarDiccionario();
-
 </script>
 
 </body>
