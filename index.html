@@ -35,7 +35,7 @@
     <div id="estado">Cargando diccionario...</div>
 
     <table>
-        <thead><tr><th>Palabra</th><th>Largo</th><th>Puntaje</th></tr></thead>
+        <thead><tr><th>Palabra</th><th>Puntaje</th><th>Largo</th></tr></thead>
         <tbody id="resultados"></tbody>
     </table>
 
@@ -98,12 +98,12 @@
                 if (res.posible) resultados.push({ palabra, largo: palabra.length, puntaje: res.puntaje });
             }
 
-            resultados.sort((a, b) => b.largo - a.largo || b.puntaje - a.puntaje || a.palabra.localeCompare(b.palabra));
+            resultados.sort((a, b) => b.puntaje - a.puntaje || b.largo - a.largo || a.palabra.localeCompare(b.palabra));
 
             document.getElementById("resultados").innerHTML = resultados.map(r => `
                 <tr>
                     <td><a href="https://dle.rae.es/${r.palabra.toLowerCase()}" target="_blank" rel="noopener noreferrer">${r.palabra}</a></td>
-                    <td>${r.largo}</td><td>${r.puntaje}</td>
+                    <td>${r.puntaje}</td><td>${r.largo}</td>
                 </tr>`).join('');
 
             document.getElementById("estado").textContent = `${resultados.length} palabras encontradas`;
